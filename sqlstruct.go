@@ -13,10 +13,20 @@ with "encoding/json" package.
 
 For example:
 
+	type T1 struct {
+		F4 string `sql:"field4"`
+    }
+
+	type T2 struct {
+		F5 string `sql:"field5"`
+	}
+
     type T struct {
-        F1 string
-        F2 string `sql:"field2"`
-        F3 string `sql:"-"`
+        F1      string
+        F2      string `sql:"field2"`
+        F3      string `sql:"-"`
+		fieldT1 T1     `sql:"..."`
+		T2
     }
 
     rows, err := db.Query(fmt.Sprintf("SELECT %s FROM tablename", sqlstruct.Columns(T{})))
@@ -146,7 +156,7 @@ func getFieldInfo(typ reflect.Type) fieldInfo {
 		}
 
 		// Handle embedded structs
-		if f.Anonymous && f.Type.Kind() == reflect.Struct {
+		if (f.Anonymous || tag == "...") && f.Type.Kind() == reflect.Struct {
 			for k, v := range getFieldInfo(f.Type) {
 				finfo[k] = append([]int{i}, v...)
 			}
