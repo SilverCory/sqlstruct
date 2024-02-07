@@ -146,10 +146,12 @@ func getFieldInfo(typ reflect.Type) fieldInfo {
 	finfo = make(fieldInfo)
 
 	n := typ.NumField()
+	var name = typ.Name()
+	fmt.Println(name, "n: ", n)
 	for i := 0; i < n; i++ {
 		f := typ.Field(i)
 		tag := f.Tag.Get(TagName)
-		fmt.Println("tag: ", tag)
+		fmt.Println(name, "tag: ", tag)
 
 		// Skip unexported fields or fields marked with "-"
 		if f.PkgPath != "" || tag == "-" {
