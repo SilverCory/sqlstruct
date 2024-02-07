@@ -133,9 +133,23 @@ type Rows interface {
 	Columns() ([]string, error)
 }
 
+type SqlDescriber interface {
+	DescribeSql() map[string][]int
+}
+
+var describerType = reflect.TypeOf((*SqlDescriber)(nil)).Elem()
+
 // getFieldInfo creates a fieldInfo for the provided type. Fields that are not tagged
 // with the "sql" tag and unexported fields are not included.
 func getFieldInfo(typ reflect.Type) fieldInfo {
+	if typ.Implements(describerType) {
+		if m, ok := typ.(SqlDescriber); ok {
+			fmt.Println("Using custom describer")
+			return m.DescribeSql()
+		}
+	}
+	fmt.Println("Using default describer")
+
 	finfoLock.RLock()
 	finfo, ok := finfos[typ]
 	finfoLock.RUnlock()
